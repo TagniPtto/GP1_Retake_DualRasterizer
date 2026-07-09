@@ -1,0 +1,26 @@
+name : BUILD
+
+on: 
+  workflow_dispatch:
+  push:
+    branches: [master, main]
+    paths-ignore:
+    - '**/README.md'
+    - '.github/workflow'
+    
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy: 
+      matrix:
+        BUILDTYPE : [Release,Debug]
+  
+    steps:
+      - name : Checkout Repo
+        uses : actions/checkout@v4
+  
+      - name : Configure Cmake
+        run : cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.BUILDTYPE}}
+
+      - name : Build using Cmake
+        run : cmake --build ${{github.workspace}}/build --config ${{matrix.BUILDTYPE}}
