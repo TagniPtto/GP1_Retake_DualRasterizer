@@ -132,7 +132,7 @@ BaseEffect* Mesh::GetEffectPtr()
 	return m_pEffect;
 }
 
-dae::Matrix Mesh::GetWorldMatrix()
+Matrix Mesh::GetWorldMatrix()
 {
 	return dae::Matrix::CreateTranslation(m_worldPosition) * dae::Matrix::CreateRotation(m_worldRotation) * dae::Matrix::CreateScale(m_worldScale);
 }

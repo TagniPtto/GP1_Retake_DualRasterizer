@@ -1,8 +1,8 @@
-#include "pch.h"
+#include "../pch.h"
 #include "Renderer.h"
 
-#include "Mesh.h"
-#include "Utils.h"
+#include "../Mesh.h"
+#include "../Utils.h"
 
 
 

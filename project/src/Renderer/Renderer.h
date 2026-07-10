@@ -7,8 +7,9 @@
 #include <dxgi.h>
 #include <d3dx11effect.h>
 
-#include "Mesh.h"
-#include "Camera.h"
+#include <memory>
+#include "../Mesh.h"
+#include "../Camera.h"
 
 
 struct SDL_Window;
@@ -68,9 +69,9 @@ namespace dae
 		BaseEffect* m_pDiffusePhongEffect;
 		BaseEffect* m_pTransparencyEffect;
 
-		Mesh* m_pMesh;
-		Mesh* m_pFireMesh;
-		Camera* m_pCamera;
+		std::unique_ptr<Mesh> m_pMesh;
+		std::unique_ptr<Mesh> m_pFireMesh;
+		std::unique_ptr<Camera> m_pCamera;
 
 		//Software rasterizer 
 	private:

@@ -5,8 +5,8 @@
 #include "Vector4.h"
 
 #include "Timer.h"
-#include "Math.h"
-#include "Matrix.h"
+#include "math/Math.h"
+#include "math/Matrix.h"
 
 #include <SDL_keyboard.h>
 #include <SDL_mouse.h>

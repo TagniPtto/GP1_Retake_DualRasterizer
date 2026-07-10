@@ -4,7 +4,8 @@
 
 #include "DataTypes.h"
 #include "Texture.h"
-#include "Effect.h"
+#include "BaseEffect.h"
+#include "Math/Math.h"
 
 #include <vector>
 

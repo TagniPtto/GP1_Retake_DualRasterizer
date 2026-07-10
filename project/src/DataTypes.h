@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Vector4.h"
-#include "Vector3.h"
-#include "Vector2.h"
+#include "Math/Vector4.h"
+#include "Math/Vector3.h"
+#include "Math/Vector2.h"
 #include "ColorRGB.h"
+
 struct VS_INPUT {
 	float position[3];
 	float color[3];
