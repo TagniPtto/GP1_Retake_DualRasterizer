@@ -215,11 +215,6 @@ dae::DirectXRenderer::~DirectXRenderer()
     {
         m_pSwapChain->Release();
     }
-    if (m_pDeviceContext)
-    {
-        m_pDeviceContext->Release();
-    }
-
     if (m_pDeviceContext) {
         m_pDeviceContext->ClearState();
         m_pDeviceContext->Flush();
@@ -228,6 +223,8 @@ dae::DirectXRenderer::~DirectXRenderer()
     if (m_pDevice) {
         m_pDevice->Release();
     }
+
+
 }
 void dae::DirectXRenderer::Render() const
 {

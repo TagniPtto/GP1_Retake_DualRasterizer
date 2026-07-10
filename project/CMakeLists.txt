@@ -16,10 +16,10 @@ set(SOURCES
     "src/Renderer/CPU/SoftwareRenderer.cpp" 
     "src/Mesh.cpp"
     "src/Camera.cpp"
-    "src/Texture.cpp" "src/Renderer/GPU/VertexBuffer.cpp" "src/Renderer/GPU/IndexBuffer.cpp")
+    "src/Texture.cpp" "src/Renderer/GPU/gpu_VertexBuffer.cpp" "src/Renderer/GPU/gpu_IndexBuffer.cpp" "src/Renderer/GPU/gpu_Mesh.cpp")
 
 # Create the executable
-add_executable(${PROJECT_NAME} ${SOURCES} )
+add_executable(${PROJECT_NAME} ${SOURCES}  "src/Renderer/GPU/Windows/dx_Texture.cpp")
 
 # only needed if header files are not in same directory as source files
 # target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
