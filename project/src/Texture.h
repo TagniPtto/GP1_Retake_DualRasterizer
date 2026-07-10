@@ -4,7 +4,7 @@
 
 #include "d3d11.h"
 
-#include "Vector2.h"
+#include "Math/Vector2.h"
 #include "ColorRGB.h"
 
 class Texture {

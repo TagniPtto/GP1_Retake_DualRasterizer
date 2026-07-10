@@ -1,9 +1,10 @@
 #include "Mesh.h"
+#include "utils.h"
+#include "Math/Math.h"
 
 #include <iostream>
 
 
-#include "utils.h"
 
 
 Mesh::Mesh(ID3D11Device* pDevice,
@@ -132,7 +133,7 @@ BaseEffect* Mesh::GetEffectPtr()
 	return m_pEffect;
 }
 
-Matrix Mesh::GetWorldMatrix()
+dae::Matrix Mesh::GetWorldMatrix()
 {
 	return dae::Matrix::CreateTranslation(m_worldPosition) * dae::Matrix::CreateRotation(m_worldRotation) * dae::Matrix::CreateScale(m_worldScale);
 }

@@ -1,18 +1,20 @@
 #pragma once
-#include "pch.h"
+#include "../pch.h"
 
 
 namespace dae {
 	class IRenderer {
 	public:
+		IRenderer() = default;
 		virtual ~IRenderer() = default;
 
+		virtual void Initialize(SDL_Window* windowHandle) = 0;
 		virtual void Render() const = 0;
-		void Update(const Timer* pTimer) = 0;
+		virtual void Update(const Timer* pTimer) = 0;
 
-		Renderer(const Renderer&) = delete;
-		Renderer(Renderer&&) noexcept = delete;
-		Renderer& operator=(const Renderer&) = delete;
-		Renderer& operator=(Renderer&&) noexcept = delete;
+		IRenderer(const IRenderer&) = delete;
+		IRenderer(IRenderer&&) noexcept = delete;
+		IRenderer& operator=(const IRenderer&) = delete;
+		IRenderer& operator=(IRenderer&&) noexcept = delete;
 	};
 }

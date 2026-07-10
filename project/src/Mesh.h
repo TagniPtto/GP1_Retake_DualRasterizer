@@ -4,7 +4,7 @@
 
 #include "DataTypes.h"
 #include "Texture.h"
-#include "BaseEffect.h"
+#include "Renderer/GPU/Windows/Effects/BaseEffect.h"
 #include "Math/Math.h"
 
 #include <vector>

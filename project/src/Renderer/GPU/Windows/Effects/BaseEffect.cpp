@@ -1,5 +1,4 @@
 #include "BaseEffect.h"
-#include "../../../Texture.h"
 
 
 #include <sstream>

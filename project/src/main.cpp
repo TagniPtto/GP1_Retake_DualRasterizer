@@ -5,7 +5,9 @@
 #endif
 
 #undef main
-#include "Renderer.h"
+//#include "Renderer.h"
+
+#include "Renderer/GPU/Windows/DirectXRenderer.h"
 
 using namespace dae;
 
@@ -38,7 +40,8 @@ int main(int argc, char* args[])
 
 	//Initialize "framework"
 	const auto pTimer = new Timer();
-	const auto pRenderer = new Renderer(pWindow);
+	const auto pRenderer = new DirectXRenderer();
+
 
 	//Start loop
 	pTimer->Start();
@@ -72,13 +75,13 @@ int main(int argc, char* args[])
 		//--------- Timer ---------
 		pTimer->Update();
 		printTimer += pTimer->GetElapsed();
-		if (pRenderer->m_printFPS) {
-			if (printTimer >= 1.f)
-			{
-				printTimer = 0.f;
-				std::cout << "dFPS: " << pTimer->GetdFPS() << std::endl;
-			}
-		}
+		//if (pRenderer->m_printFPS) {
+		//	if (printTimer >= 1.f)
+		//	{
+		//		printTimer = 0.f;
+		//		std::cout << "dFPS: " << pTimer->GetdFPS() << std::endl;
+		//	}
+		//}
 
 	}
 	pTimer->Stop();

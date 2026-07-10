@@ -1,6 +1,6 @@
 #include "TransparencyEffect.h"
-
-
+#include "../../../../Texture.h"
+#include <iostream>
 
 dae::TransparencyEffect::TransparencyEffect(ID3D11Device* pDevice, Texture* diffuseTexture) :
     BaseEffect(pDevice, std::wstring(L"resources/Transparency.fx")), m_pDiffuseTexture(diffuseTexture)
@@ -22,6 +22,9 @@ dae::TransparencyEffect::~TransparencyEffect()
     m_pDiffuseMapVariable->Release();
     m_pDiffuseMapVariable = nullptr;
 }
+
+void dae::TransparencyEffect::SetupEffect()
+{}
 
 void dae::TransparencyEffect::SetDiffuseMap(Texture* pDiffuseTexture)
 {

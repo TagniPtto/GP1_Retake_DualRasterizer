@@ -10,6 +10,9 @@
 #include <memory>
 #include "../Mesh.h"
 #include "../Camera.h"
+#include "GPU/Windows/Effects/BaseEffect.h"
+#include "GPU/Windows/Effects/PhongDiffuseEffect.h"
+#include "GPU/Windows/Effects/TransparencyEffect.h"
 
 
 struct SDL_Window;

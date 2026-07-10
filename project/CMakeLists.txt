@@ -16,7 +16,7 @@ set(SOURCES
     "src/Renderer/CPU/SoftwareRenderer.cpp" 
     "src/Mesh.cpp"
     "src/Camera.cpp"
-    "src/Texture.cpp")
+    "src/Texture.cpp" "src/Renderer/GPU/VertexBuffer.cpp" "src/Renderer/GPU/IndexBuffer.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} )

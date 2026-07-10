@@ -2,7 +2,7 @@
 #include "d3dx11effect.h"
 #include <string>
 
-#include "../../../Math/Math.h"
+#include "../../../../Math/Math.h"
 
 
 class Texture;

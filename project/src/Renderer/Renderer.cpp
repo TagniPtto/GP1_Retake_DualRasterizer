@@ -8,7 +8,19 @@
 
 
 namespace dae {
+	inline bool TriangleTest(const Vertex_Out& v0, const Vertex_Out& v1, const Vertex_Out& v2, const Vector2& p, Vector3& outWeigths) {
+		const Vector2 p0{ v0.position.x,v0.position.y };
+		const Vector2 p1{ v1.position.x,v1.position.y };
+		const Vector2 p2{ v2.position.x,v2.position.y };
 
+		const float doubleTriangleArea{ Vector2::Cross(p1 - p0,p2 - p0) };
+		outWeigths.z = { Vector2::Cross(p1 - p0,p - p0) / (doubleTriangleArea) };
+		outWeigths.y = { Vector2::Cross(p0 - p2,p - p2) / (doubleTriangleArea) };
+		outWeigths.x = { Vector2::Cross(p2 - p1,p - p1) / (doubleTriangleArea) };
+
+
+		return (outWeigths.x >= 0.f && outWeigths.y >= 0.f && outWeigths.z >= 0.f);
+	}
 	Renderer::Renderer(SDL_Window* pWindow) :
 		m_pWindow(pWindow)
 	{
@@ -64,7 +76,7 @@ namespace dae {
 		m_pTransparencyEffect = new TransparencyEffect(
 			m_pDevice, m_pFireDiffuseTexture);
 
-		m_pMesh = new Mesh(m_pDevice,
+		m_pMesh = std::make_unique<Mesh>(m_pDevice,
 			vehicleObjectFilePath,
 			m_pDiffusePhongEffect,
 			m_pVehicleDiffuseTexture,
@@ -72,12 +84,12 @@ namespace dae {
 			m_pVehicleGlossTexture,
 			m_pVehicleSpecularTexture);
 
-		m_pFireMesh = new Mesh(m_pDevice,
+		m_pFireMesh = std::make_unique<Mesh>(m_pDevice,
 			fireObjectFilePath,
 			m_pTransparencyEffect,
 			m_pFireDiffuseTexture
 			);
-		m_pCamera = new Camera(float(m_Width)/m_Height);
+		m_pCamera = std::make_unique<Camera>(float(m_Width)/m_Height);
 
 	}
 
@@ -118,10 +130,6 @@ namespace dae {
 		{
 			m_pDevice->Release();
 		}
-		delete m_pMesh;
-		delete m_pCamera;
-		delete m_pFireMesh;
-
 		delete m_pTransparencyEffect;
 		delete m_pDiffusePhongEffect;
 
@@ -132,9 +140,6 @@ namespace dae {
 		delete m_pVehicleGlossTexture;
 		delete m_pVehicleSpecularTexture;
 
-		m_pMesh = nullptr;
-		m_pFireMesh = nullptr;
-		m_pCamera = nullptr;
 		//ReportLiveObjects();
 	}
 
@@ -330,7 +335,7 @@ namespace dae {
 					
 
 					Vector3 weigths{};
-					if (Utils::TriangleTest(v0, v1, v2, p, weigths)) {
+					if (TriangleTest(v0, v1, v2, p, weigths)) {
 
 
 						const float depth{ 1.f / ((weigths.x / (v0.position.w)) + (weigths.y / (v1.position.w)) + (weigths.z / (v2.position.w))) };

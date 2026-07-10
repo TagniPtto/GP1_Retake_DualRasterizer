@@ -1,5 +1,5 @@
 #include "PhongDiffuseEffect.h"
-
+#include "../../../../Texture.h"
 #include <iostream>
 
 dae::PhongDiffuseEffect::PhongDiffuseEffect(ID3D11Device* pDevice,
