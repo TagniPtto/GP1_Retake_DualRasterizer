@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-void PrintHResult(HRESULT hr)
+inline void PrintHResult(HRESULT hr)
 {
     LPSTR message = nullptr;
 
@@ -30,7 +30,7 @@ HRESULT dae::DirectXRenderer::CreateDeviceAndContext()
 
     uint8_t deviceFlags = 0;
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(_DEBUG)
     deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
@@ -38,6 +38,7 @@ HRESULT dae::DirectXRenderer::CreateDeviceAndContext()
     if (FAILED(result)) {
         PrintHResult(result);
     }
+
     return result;
 }
 
@@ -117,7 +118,7 @@ HRESULT dae::DirectXRenderer::CreateDepthStencil()
     return result;
 }
 
-HRESULT dae::DirectXRenderer::SetupRenderTargetView()
+HRESULT dae::DirectXRenderer::CreateRenderTargetView()
 {
 
     HRESULT result = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&m_pRenderTargetBuffer));
@@ -126,12 +127,33 @@ HRESULT dae::DirectXRenderer::SetupRenderTargetView()
         return result;
     }
 
-    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDescriptor{};
-    result = m_pDevice->CreateRenderTargetView(m_pRenderTargetBuffer,&renderTargetViewDescriptor,&m_pRenderTargetView);
+    //D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDescriptor{};
+    result = m_pDevice->CreateRenderTargetView(m_pRenderTargetBuffer,nullptr,&m_pRenderTargetView);
     if (FAILED(result)) {
         PrintHResult(result);
     }
     return result;
+}
+
+HRESULT dae::DirectXRenderer::BindBuffersToOutputMerger()
+{
+    m_pDeviceContext->OMSetRenderTargets(1,&m_pRenderTargetView,m_pDepthStencilView);
+    return S_OK;
+}
+
+HRESULT dae::DirectXRenderer::SetRasterizerViewport()
+{
+    D3D11_VIEWPORT viewport{};
+    viewport.Width = m_Width;
+    viewport.Height = m_Height;
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.MinDepth = 1;
+    viewport.MaxDepth = 1;
+
+    m_pDeviceContext->RSSetViewports(1,&viewport);
+
+    return S_OK;
 }
 
 void dae::DirectXRenderer::Initialize(SDL_Window* handle)
@@ -139,13 +161,80 @@ void dae::DirectXRenderer::Initialize(SDL_Window* handle)
     m_windowHandle = handle;
     SDL_GetWindowSize(m_windowHandle , &m_Width, &m_Height);
 
-    CreateDeviceAndContext();
-    CreateSwapChain();
-    CreateDepthStencil();
-    SetupRenderTargetView();
+    std::cout << "[Renderer] Creating D3D11 Device ...\n";
+    if (FAILED(CreateDeviceAndContext())) 
+    {
+        std::cout << "[Renderer] Failed to Create D3D11 Device ...\n";
+        return;
+    }
+    std::cout << "[Renderer] Creating D3D11 SwapChain ...\n";
+    if (FAILED(CreateSwapChain())) 
+    {
+        std::cout << "[Renderer] Failed to Create D3D11 SwapChain ...\n";
+        return;
+    }
+    std::cout << "[Renderer] Creating D3D11 DepthStencil ...\n";
+    if (FAILED(CreateDepthStencil()))
+    {
+        std::cout << "[Renderer] Creating D3D11 DepthStencil ...\n";
+        return;
+    }
+    std::cout << "[Renderer] Creating D3D11 RenderTarget View...\n";
+    if (FAILED(CreateRenderTargetView()))
+    {
+        std::cout << "[Renderer]  Failed to Create D3D11 RenderTarget View...\n";
+        return;
+    }
+
+    std::cout << "[Renderer] Binding depthstencil and rendertarget views to OutputMerger...\n";
+    BindBuffersToOutputMerger();
+    std::cout << "[Renderer] Setting rasterizer viewport...\n";
+    SetRasterizerViewport();
+
+    std::cout << "[Renderer] D3D11 Initialization success...\n";
+}
+dae::DirectXRenderer::~DirectXRenderer()
+{
+    if (m_pRenderTargetView)
+    {
+        m_pRenderTargetView->Release();
+    }
+    if (m_pRenderTargetBuffer)
+    {
+        m_pRenderTargetBuffer->Release();
+    }
+    if (m_pDepthStencilView)
+    {
+        m_pDepthStencilView->Release();
+    }
+    if (m_pDepthStencilBuffer)
+    {
+        m_pDepthStencilBuffer->Release();
+    }
+    if (m_pSwapChain)
+    {
+        m_pSwapChain->Release();
+    }
+    if (m_pDeviceContext)
+    {
+        m_pDeviceContext->Release();
+    }
+
+    if (m_pDeviceContext) {
+        m_pDeviceContext->ClearState();
+        m_pDeviceContext->Flush();
+        m_pDeviceContext->Release();
+    }
+    if (m_pDevice) {
+        m_pDevice->Release();
+    }
 }
 void dae::DirectXRenderer::Render() const
 {
+    m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, clearColor);
+    m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView,D3D11_CLEAR_STENCIL| D3D11_CLEAR_DEPTH,1.0f,0);
+
+    m_pSwapChain->Present(0,0);
 }
 
 void dae::DirectXRenderer::Update(const Timer* pTimer)

@@ -35,16 +35,16 @@ namespace dae {
 
 
 		//Initialize DirectX pipeline
-		const HRESULT result = InitializeDirectX();
-		if (result == S_OK)
-		{
-			m_IsInitialized = true;
-			std::cout << "DirectX is initialized and ready!\n";
-		}
-		else
-		{
-			std::cout << "DirectX initialization failed!\n";
-		}
+		//const HRESULT result = InitializeDirectX();
+		//if (result == S_OK)
+		//{
+		//	m_IsInitialized = true;
+		//	std::cout << "DirectX is initialized and ready!\n";
+		//}
+		//else
+		//{
+		//	std::cout << "DirectX initialization failed!\n";
+		//}
 		const static std::string fireObjectFilePath("resources/fireFX.obj");
 
 		const static std::string fireDiffuseTextureFilePath("resources/fireFX_diffuse.png");
@@ -88,8 +88,8 @@ namespace dae {
 			fireObjectFilePath,
 			m_pTransparencyEffect,
 			m_pFireDiffuseTexture
-			);
-		m_pCamera = std::make_unique<Camera>(float(m_Width)/m_Height);
+		);
+		m_pCamera = std::make_unique<Camera>(float(m_Width) / m_Height);
 
 	}
 
@@ -242,7 +242,7 @@ namespace dae {
 
 
 		if (m_rotateMesh) {
-			m_pMesh->Rotate(Vector3{0,pTimer->GetElapsed(),0});
+			m_pMesh->Rotate(Vector3{ 0,pTimer->GetElapsed(),0 });
 		}
 
 		m_pCamera->Update(pTimer);
@@ -332,10 +332,13 @@ namespace dae {
 					ColorRGB finalColor{ };
 
 					const Vector2 p{ float(px),float(py) };
-					
+
 
 					Vector3 weigths{};
 					if (TriangleTest(v0, v1, v2, p, weigths)) {
+
+						//Formula for corrective depth can be derived from some basic math see ->
+						//https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/visibility-problem-depth-buffer-depth-interpolation.html
 
 
 						const float depth{ 1.f / ((weigths.x / (v0.position.w)) + (weigths.y / (v1.position.w)) + (weigths.z / (v2.position.w))) };
@@ -345,28 +348,15 @@ namespace dae {
 						if (m_pDepthBuffer[px + py * m_Width] > depth && (clippingDepth >= 0 && clippingDepth <= 1)) {
 							m_pDepthBuffer[px + py * m_Width] = depth;
 
-							//Vertex_Out vOut{
-							//	Vector4{(weigths.x * v0.position / (v0.position.w) + weigths.y * v1.position / (v1.position.w) + weigths.z * v2.position / (v2.position.w)) * depth,1.0f},
-							//	ColorRGB{weigths.x,weigths.y,weigths.z},//v0.color * weigths.x + v1.color * weigths.y + v2.color * weigths.z,
-							//	(weigths.x * v0.uv / (v0.position.w) + weigths.y * v1.uv / (v1.position.w) + weigths.z * v2.uv / (v2.position.w)) * depth,
-							//	((weigths.x * v0.normal / (v0.position.w) + weigths.y * v1.normal / (v1.position.w) + weigths.z * v2.normal / (v2.position.w))* depth).Normalized(),//weigths.x * v0.normal + weigths.y * v1.normal + weigths.z * v2.normal,
-							//	((weigths.x * v0.tangent / (v0.position.w) + weigths.y * v1.tangent / (v1.position.w) + weigths.z * v2.tangent / (v2.position.w))* depth).Normalized(),//weigths.x * v0.tangent + weigths.y * v1.tangent + weigths.z * v2.tangent,
-							//	((weigths.x * v0.viewDirection / (v0.position.w) + weigths.y * v1.viewDirection / (v1.position.w) + weigths.z * v2.viewDirection / (v2.position.w))* depth).Normalized(),
-							//};
 							Vertex_Out vOut{
-								// Position: perspective-correct
-								Vector4{(weigths.x * v0.position / (v0.position.w) + weigths.y * v1.position / (v1.position.w) + weigths.z * v2.position / (v2.position.w)) * depth, 1.0f},
-								// Color: barycentric
-								ColorRGB{weigths.x, weigths.y, weigths.z},
-								// UV: perspective-correct
+								Vector4{(weigths.x * v0.position / (v0.position.w) + weigths.y * v1.position / (v1.position.w) + weigths.z * v2.position / (v2.position.w)) * depth,1.0f},
+								ColorRGB{weigths.x,weigths.y,weigths.z},
 								(weigths.x * v0.uv / (v0.position.w) + weigths.y * v1.uv / (v1.position.w) + weigths.z * v2.uv / (v2.position.w)) * depth,
-								// Normal: linear
-								(weigths.x * v0.normal + weigths.y * v1.normal + weigths.z * v2.normal).Normalized(),
-								// Tangent: linear
-								(weigths.x * v0.tangent + weigths.y * v1.tangent + weigths.z * v2.tangent).Normalized(),
-								// ViewDirection: linear
-								(weigths.x * v0.viewDirection + weigths.y * v1.viewDirection + weigths.z * v2.viewDirection).Normalized(),
+								((weigths.x * v0.normal / (v0.position.w) + weigths.y * v1.normal / (v1.position.w) + weigths.z * v2.normal / (v2.position.w)) * depth).Normalized(),
+								((weigths.x * v0.tangent / (v0.position.w) + weigths.y * v1.tangent / (v1.position.w) + weigths.z * v2.tangent / (v2.position.w)) * depth).Normalized(),
+								((weigths.x * v0.viewDirection / (v0.position.w) + weigths.y * v1.viewDirection / (v1.position.w) + weigths.z * v2.viewDirection / (v2.position.w)) * depth).Normalized(),
 							};
+
 							finalColor = PixelShading(vOut);
 
 							finalColor.MaxToOne();
@@ -378,14 +368,14 @@ namespace dae {
 						}
 					}
 					if (m_showBoundingBox) {
-						const float BorderPixelWidth{2};
-						if (px <= xmin_boundingBox + BorderPixelWidth || 
-							py <= ymin_boundingBox + BorderPixelWidth || 
-							px >= xmax_boundingBox - BorderPixelWidth || 
+						const float BorderPixelWidth{ 2 };
+						if (px <= xmin_boundingBox + BorderPixelWidth ||
+							py <= ymin_boundingBox + BorderPixelWidth ||
+							px >= xmax_boundingBox - BorderPixelWidth ||
 							py >= ymax_boundingBox - BorderPixelWidth) {
 							finalColor = ColorRGB{ 1.0f,0.f,0.f };
 							finalColor.MaxToOne();
-					
+
 							m_pBackBufferPixels[px + (py * m_Width)] = SDL_MapRGB(m_pBackBuffer->format,
 								static_cast<uint8_t>(finalColor.r * 255),
 								static_cast<uint8_t>(finalColor.g * 255),
@@ -424,148 +414,14 @@ namespace dae {
 		// 2. SET PIPELINE + INVOKE DRAW CALLS (= RENDER)
 
 		m_pMesh->Render(m_pDeviceContext, m_pCamera->GetSamplingTechniqueIndex());
-		if(m_showFire)
+		if (m_showFire)
 			m_pFireMesh->Render(m_pDeviceContext, m_pCamera->GetSamplingTechniqueIndex());
 
 
 		// 3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);
 	}
-
-	HRESULT Renderer::InitializeDirectX()
-	{
-
-
-		//CONFIGURING AND CREATING DEVICE AND DEVICE CONTEXT
-		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_1;
-
-		uint32_t createDeviceFlags = 0;
-
-#if defined(DEBUG) || defined(_DEBUG)
-		createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-		HRESULT result = D3D11CreateDevice(nullptr,D3D_DRIVER_TYPE_HARDWARE,0,createDeviceFlags,&featureLevel,1,D3D11_SDK_VERSION,&m_pDevice,nullptr,&m_pDeviceContext);
-		if (FAILED(result)) {
-			__debugbreak();
-			return result;
-		}
-
-		//CREATING SWAPCHAIN-----------------------------------------------------
-
-		//Create a DXGI Factory to Create a custom SWAPCHAIN to fit your hardware
-		IDXGIFactory1* dxgiFactoryPtr{};
-		result = CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&dxgiFactoryPtr));
-		if (FAILED(result)) {
-			__debugbreak();
-			return result;
-		}
-
-
-		DXGI_SWAP_CHAIN_DESC swapChainDescriptor{};
-		swapChainDescriptor.BufferDesc.Width = m_Width;
-		swapChainDescriptor.BufferDesc.Height = m_Height;
-		swapChainDescriptor.BufferDesc.RefreshRate.Numerator = 1;
-		swapChainDescriptor.BufferDesc.RefreshRate.Denominator = 60;
-		swapChainDescriptor.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		swapChainDescriptor.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		swapChainDescriptor.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		swapChainDescriptor.SampleDesc.Count = 1;
-		swapChainDescriptor.SampleDesc.Quality = 0;
-		swapChainDescriptor.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swapChainDescriptor.BufferCount = 1;
-		swapChainDescriptor.Windowed = true;
-		swapChainDescriptor.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-		swapChainDescriptor.Flags = 0;
-		//---------------------------------------------------------------
-
-
-
-		// Retrieving the window handle to attach the swapchain to the window
-		SDL_SysWMinfo sysWMinfo{};
-		SDL_GetVersion(&sysWMinfo.version);
-		SDL_GetWindowWMInfo(m_pWindow, &sysWMinfo);
-
-		swapChainDescriptor.OutputWindow = sysWMinfo.info.win.window;
-
-
-		// Creating Texture 2d To use as depht stencil
-		D3D11_TEXTURE2D_DESC depthStencilDesc{};
-		depthStencilDesc.Width = m_Width;
-		depthStencilDesc.Height = m_Height;
-		depthStencilDesc.MipLevels = 1;
-		depthStencilDesc.ArraySize = 1;
-		depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		depthStencilDesc.SampleDesc.Count = 1;
-		depthStencilDesc.SampleDesc.Quality = 0;
-		depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-		depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		depthStencilDesc.CPUAccessFlags = 0;
-		depthStencilDesc.MiscFlags = 0;
-
-		// Making a resource view to use texture 2d as a depthStencilBuffer 
-		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc{};
-		depthStencilViewDesc.Format = depthStencilDesc.Format;
-		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		depthStencilViewDesc.Texture2D.MipSlice = 0;
-
-		// After which we create both the resource and matching resource view.
-		result = m_pDevice->CreateTexture2D(&depthStencilDesc,  nullptr, &m_pDepthStencilBuffer);
-		if (FAILED(result)) {
-			__debugbreak();
-			return result;
-		}
-
-
-		result = m_pDevice->CreateDepthStencilView(m_pDepthStencilBuffer, &depthStencilViewDesc, &m_pDepthStencilView);
-		if (FAILED(result)) {
-			__debugbreak();
-			return result;
-		}
-
-
-		result = dxgiFactoryPtr->CreateSwapChain(m_pDevice,&swapChainDescriptor,&m_pSwapChain);
-		dxgiFactoryPtr->Release();
-		if (FAILED(result)) {
-			__debugbreak();
-			return result;
-		}
-		// 4. Create RenderTarget (RT) & RenderTargetView (RTV)
-// =====
-
-// Resource
-		result = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&m_pRenderTargetBuffer));
-		if (FAILED(result)) {
-			__debugbreak();
-			return result;
-		}
-		// View
-		///---------------------------------------------------------------------------------
-		// A View is just an interpretation of data just like casting raw data to a datatype
-		///---------------------------------------------------------------------------------
-
-		result = m_pDevice->CreateRenderTargetView(m_pRenderTargetBuffer, nullptr, &m_pRenderTargetView);
-		if (FAILED(result)) {
-			__debugbreak();
-			return result;
-		}
-		// 5. Bind RTV & DSV to Output Merger Stage
-		m_pDeviceContext->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
-
-		//6. Set Viewport
-		//=====
-		D3D11_VIEWPORT viewport{};
-		viewport.Width = static_cast<float>(m_Width);
-		viewport.Height = static_cast<float>(m_Height);
-		viewport.TopLeftX = 0.f;
-		viewport.TopLeftY = 0.f;
-		viewport.MinDepth = 0.f;
-		viewport.MaxDepth = 1.f;
-		m_pDeviceContext->RSSetViewports(1, &viewport);
-
-		return S_OK;
-	}
 }
-
 
 void dae::Renderer::VertexTransformationFunction(const std::vector<VS_INPUT>& vertices_in, std::vector<Vertex_Out>& vertices_out) const
 {

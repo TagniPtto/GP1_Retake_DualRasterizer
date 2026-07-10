@@ -22,8 +22,11 @@ namespace dae
 		//std::unordered_map<uint64_t, > m_effectResources;
 
 
-		ID3D11Device* m_pDevice;
-		ID3D11DeviceContext* m_pDeviceContext;
+
+	
+		ID3D11Device* m_pDevice;  					// For creating GPU Resources
+		ID3D11DeviceContext* m_pDeviceContext;		// For Telling the GPU What to do (Thing like drawing commands)
+		
 		IDXGISwapChain* m_pSwapChain;
 
 		ID3D11Texture2D* m_pDepthStencilBuffer;
@@ -32,9 +35,10 @@ namespace dae
 		ID3D11Texture2D* m_pRenderTargetBuffer;
 		ID3D11RenderTargetView* m_pRenderTargetView;
 
+		float clearColor[4] = { .39f, .59f, .93f , 1.f };
+
 	public:
-		DirectXRenderer() = default;
-		virtual ~DirectXRenderer() override = default;
+		virtual ~DirectXRenderer() override;
 		virtual void Render() const override;
 		virtual void Update(const Timer* pTimer) override;
 		void Initialize(SDL_Window* handle);
@@ -44,6 +48,9 @@ namespace dae
 		HRESULT CreateDeviceAndContext();
 		HRESULT CreateSwapChain();
 		HRESULT CreateDepthStencil();
-		HRESULT SetupRenderTargetView();
+		HRESULT CreateRenderTargetView();
+		HRESULT BindBuffersToOutputMerger();
+		HRESULT SetRasterizerViewport();
+
 	};
 }
