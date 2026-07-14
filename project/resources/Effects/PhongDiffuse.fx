@@ -21,7 +21,6 @@ Texture2D gSpecularMap : SpecularMap;
 Texture2D gTransparentDiffuseMap : TransparentDiffuseMap;
 
 
-///check [VERTEX SHADER SEMANTICS]     <===================
 struct VS_INPUT{
     float3 Position : POSITION;
     float3 Color : COLOR;
@@ -30,7 +29,6 @@ struct VS_INPUT{
     float3 Tangent : TANGENT;
 };
 
-///check [PIXEL SHADER SEMANTICS]      <==============
 struct VS_OUTPUT{
     float4 Position : SV_POSITION;
     float4 WorldPosition : WORLD;
@@ -46,35 +44,35 @@ struct VS_OUTPUT{
 VS_OUTPUT VS(VS_INPUT input){
     VS_OUTPUT output = (VS_OUTPUT)0;
     
-    
-    //To know which order to use mul see Row Major vs columnn major matrices
+   
     output.WorldPosition = mul(float4(input.Position, 1.0f), gWorldMatrix);
-    ///output.Position = mul(float4(input, 1.0f), gWorldViewProjection);
     output.Position = mul(output.WorldPosition, gWorldViewProjection);
     output.Color = input.Color;
     output.UV = input.UV;
-    output.Normal = mul(normalize(input.Normal), (float3x3) (gWorldMatrix)); //float4(-input.Normal.b, input.Normal.g, -input.Normal.r, 1.0f
+    output.Normal = mul(normalize(input.Normal), (float3x3) (gWorldMatrix)); 
     output.Tangent = mul(normalize(input.Tangent), (float3x3) (gWorldMatrix));
     output.ViewDirection = normalize(gCameraPosition - (float3)output.WorldPosition);
     
     return output;
 }
 
-
-float4 PixelShading(VS_OUTPUT input, SamplerState samplingState)
+float3 calculateNormal(VS_OUTPUT input, SamplerState samplingState)
 {
-    
-    ///NORMAL CALCULATION----------------------------------------
     float4 sampledNormal = gNormalMap.Sample(samplingState, input.UV);
     sampledNormal = float4(2.0f * sampledNormal.r - 1.0f, 2.0f * sampledNormal.g - 1.0f, 2.0f * sampledNormal.b - 1.0f, sampledNormal.a);
-    float3 biTangent = normalize(cross(input.Normal,input.Tangent));
+    float3 biTangent = normalize(cross(input.Normal, input.Tangent));
     
-    float4x4 ONB_matrix = float4x4( input.Tangent.x, biTangent.x, input.Normal.x, 0,
+    float4x4 ONB_matrix = float4x4(input.Tangent.x, biTangent.x, input.Normal.x, 0,
                                     input.Tangent.y, biTangent.y, input.Normal.y, 0,
                                     input.Tangent.z, biTangent.z, input.Normal.z, 0,
                                     0, 0, 0, 1);
-    float3 normal = normalize((float3)mul(ONB_matrix, sampledNormal));
-    // ----------------------------------------------------------
+    return normalize((float3) mul(ONB_matrix, sampledNormal));
+}
+
+float4 PixelShading(VS_OUTPUT input, SamplerState samplingState)
+{
+    float3 normal = calculateNormal(input, samplingState);
+
     
     
     

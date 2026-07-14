@@ -12,11 +12,11 @@ set(SOURCES
     "src/Renderer/GPU/Windows/Effects/TransparencyEffect.cpp"
     "src/Renderer/GPU/Windows/Effects/PhongDiffuseEffect.cpp"
 
-    "src/Renderer/GPU/Windows//DirectXRenderer.cpp" 
+    "src/Renderer/GPU/Windows/dx_Renderer.cpp" 
     "src/Renderer/CPU/SoftwareRenderer.cpp" 
     "src/Mesh.cpp"
     "src/Camera.cpp"
-    "src/Texture.cpp" "src/Renderer/GPU/gpu_VertexBuffer.cpp" "src/Renderer/GPU/gpu_IndexBuffer.cpp" "src/Renderer/GPU/gpu_Mesh.cpp")
+    "src/Texture.cpp"    "src/Renderer/GPU/Windows/dx_Mesh.h" "src/Renderer/GPU/Windows/dx_Mesh.cpp" "src/Material.cpp" "src/Renderer/GPU/Windows/dx_Material.cpp" "src/Renderer/GPU/Windows/dx_VertexBuffer.cpp" "src/Renderer/GPU/Windows/dx_IndexBuffer.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES}  "src/Renderer/GPU/Windows/dx_Texture.cpp")

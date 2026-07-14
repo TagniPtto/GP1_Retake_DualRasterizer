@@ -5,7 +5,6 @@
 #include "../../../../Math/Math.h"
 
 
-class Texture;
 class BaseEffect {
 
 protected:
@@ -15,8 +14,8 @@ protected:
 	static constexpr int techniqueCount = 3;
 	ID3DX11EffectTechnique* m_pEffectTechniques[techniqueCount];
 
-	ID3DX11EffectVectorVariable* m_pCameraPositionVariable{ nullptr };
 
+	ID3DX11EffectVectorVariable* m_pCameraPositionVariable{ nullptr };
 	ID3DX11EffectMatrixVariable* m_pWorldViewProjMatrixVariable{ nullptr };
 	ID3DX11EffectMatrixVariable* m_pWorldMatrixVariable{ nullptr };
 

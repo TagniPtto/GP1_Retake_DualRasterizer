@@ -2,14 +2,16 @@
 
 #include "BaseEffect.h"
 
+#include "../dx_Texture.h"
+
 namespace dae {
 	class PhongDiffuseEffect : public BaseEffect {
 	private:
 
-		Texture* m_pDiffuseTexture;
-		Texture* m_pNormalTexture;
-		Texture* m_pGlossTexture;
-		Texture* m_pSpecularTexture;
+		DXTexture* m_pDiffuseTexture;
+		DXTexture* m_pNormalTexture;
+		DXTexture* m_pGlossTexture;
+		DXTexture* m_pSpecularTexture;
 
 
 		ID3DX11EffectShaderResourceVariable* m_pDiffuseMapVariable{ nullptr };
@@ -17,18 +19,18 @@ namespace dae {
 		ID3DX11EffectShaderResourceVariable* m_pGlossMapVariable{ nullptr };
 		ID3DX11EffectShaderResourceVariable* m_pSpecularMapVariable{ nullptr };
 	public:
+		virtual ~PhongDiffuseEffect() = default;
 		PhongDiffuseEffect(
 			ID3D11Device* pDevice,
-			Texture* m_pDiffuseTexture,
-			Texture* m_pNormalTexture,
-			Texture* m_pGlossTexture,
-			Texture* m_pSpecularTexture);
-		virtual ~PhongDiffuseEffect();
+			DXTexture* m_pDiffuseTexture,
+			DXTexture* m_pNormalTexture,
+			DXTexture* m_pGlossTexture,
+			DXTexture* m_pSpecularTexture);
 		virtual void SetupEffect() override;
-		void SetDiffuseMap(Texture* pDiffuseTexture);
-		void SetNormalMap(Texture* pNormalTexture);
-		void SetGlossMap(Texture* pGlossTexture);
-		void SetSpecularMap(Texture* pSpecularTexture);
+		void SetDiffuseMap(DXTexture* pDiffuseTexture);
+		void SetNormalMap(DXTexture* pNormalTexture);
+		void SetGlossMap(DXTexture* pGlossTexture);
+		void SetSpecularMap(DXTexture* pSpecularTexture);
 
 	};
 }

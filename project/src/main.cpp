@@ -7,7 +7,7 @@
 #undef main
 //#include "Renderer.h"
 
-#include "Renderer/GPU/Windows/DirectXRenderer.h"
+#include "Renderer/GPU/Windows/dx_Renderer.h"
 
 using namespace dae;
 
@@ -40,8 +40,7 @@ int main(int argc, char* args[])
 
 	//Initialize "framework"
 	const auto pTimer = new Timer();
-	const auto pRenderer = new DirectXRenderer();
-	pRenderer->Initialize(pWindow);
+	const auto pRenderer = new DXRenderer(pWindow);
 
 	//Start loop
 	pTimer->Start();

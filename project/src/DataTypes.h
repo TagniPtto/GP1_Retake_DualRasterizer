@@ -12,7 +12,7 @@ struct VS_INPUT {
 	float normal[3];
 	float tangent[3];
 };
-struct Vertex_Out
+struct VS_OUTPUT
 {
 	dae::Vector4 position{};
 	dae::ColorRGB color{ 1.0f,1.0f,1.0f };

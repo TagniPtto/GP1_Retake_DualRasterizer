@@ -1,8 +1,8 @@
 #include "TransparencyEffect.h"
-#include "../../../../Texture.h"
+
 #include <iostream>
 
-dae::TransparencyEffect::TransparencyEffect(ID3D11Device* pDevice, Texture* diffuseTexture) :
+dae::TransparencyEffect::TransparencyEffect(ID3D11Device* pDevice, DXTexture* diffuseTexture) :
     BaseEffect(pDevice, std::wstring(L"resources/Transparency.fx")), m_pDiffuseTexture(diffuseTexture)
 {
 
@@ -26,7 +26,7 @@ dae::TransparencyEffect::~TransparencyEffect()
 void dae::TransparencyEffect::SetupEffect()
 {}
 
-void dae::TransparencyEffect::SetDiffuseMap(Texture* pDiffuseTexture)
+void dae::TransparencyEffect::SetDiffuseMap(DXTexture* pDiffuseTexture)
 {
     if (m_pDiffuseMapVariable && pDiffuseTexture) {
         HRESULT result = m_pDiffuseMapVariable->SetResource(pDiffuseTexture->GetShaderResourceView());

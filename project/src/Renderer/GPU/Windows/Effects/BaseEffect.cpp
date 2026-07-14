@@ -175,8 +175,6 @@ BaseEffect::~BaseEffect()
 
     m_pInputLayout->Release();
 
-
-
     m_pWorldViewProjMatrixVariable->Release();
     m_pWorldMatrixVariable->Release();
     m_pCameraPositionVariable->Release();

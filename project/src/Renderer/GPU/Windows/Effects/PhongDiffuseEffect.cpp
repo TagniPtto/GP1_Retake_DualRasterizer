@@ -3,10 +3,10 @@
 #include <iostream>
 
 dae::PhongDiffuseEffect::PhongDiffuseEffect(ID3D11Device* pDevice,
-    Texture* m_pDiffuseTexture,
-    Texture* m_pNormalTexture,
-    Texture* m_pGlossTexture,
-    Texture* m_pSpecularTexture
+    DXTexture* m_pDiffuseTexture,
+    DXTexture* m_pNormalTexture,
+    DXTexture* m_pGlossTexture,
+    DXTexture* m_pSpecularTexture
 ) : BaseEffect::BaseEffect(pDevice, std::wstring(L"resources/DiffusePhong.fx"))
 {
 
@@ -38,7 +38,7 @@ dae::PhongDiffuseEffect::PhongDiffuseEffect(ID3D11Device* pDevice,
 
 
 
-void dae::PhongDiffuseEffect::SetDiffuseMap(Texture* pDiffuseTexture)
+void dae::PhongDiffuseEffect::SetDiffuseMap(DXTexture* pDiffuseTexture)
 {
     if (m_pDiffuseMapVariable && pDiffuseTexture) {
         HRESULT result = m_pDiffuseMapVariable->SetResource(pDiffuseTexture->GetShaderResourceView());
@@ -48,7 +48,7 @@ void dae::PhongDiffuseEffect::SetDiffuseMap(Texture* pDiffuseTexture)
     }
 }
 
-void dae::PhongDiffuseEffect::SetNormalMap(Texture* pNormalTexture)
+void dae::PhongDiffuseEffect::SetNormalMap(DXTexture* pNormalTexture)
 {
     if (pNormalTexture) {
         HRESULT result = m_pNormalMapVariable->SetResource(pNormalTexture->GetShaderResourceView());
@@ -58,7 +58,7 @@ void dae::PhongDiffuseEffect::SetNormalMap(Texture* pNormalTexture)
     }
 }
 
-void dae::PhongDiffuseEffect::SetGlossMap(Texture* pGlossTexture)
+void dae::PhongDiffuseEffect::SetGlossMap(DXTexture* pGlossTexture)
 {
     if (pGlossTexture) {
         HRESULT result = m_pGlossMapVariable->SetResource(pGlossTexture->GetShaderResourceView());
@@ -68,7 +68,7 @@ void dae::PhongDiffuseEffect::SetGlossMap(Texture* pGlossTexture)
     }
 }
 
-void dae::PhongDiffuseEffect::SetSpecularMap(Texture* pSpecularTexture)
+void dae::PhongDiffuseEffect::SetSpecularMap(DXTexture* pSpecularTexture)
 {
     if (pSpecularTexture) {
         HRESULT result = m_pSpecularMapVariable->SetResource(pSpecularTexture->GetShaderResourceView());
@@ -78,25 +78,6 @@ void dae::PhongDiffuseEffect::SetSpecularMap(Texture* pSpecularTexture)
     }
 }
 
-dae::PhongDiffuseEffect::~PhongDiffuseEffect()
-{
-
-    m_pDiffuseTexture = nullptr;
-    m_pNormalTexture = nullptr;
-    m_pGlossTexture = nullptr;
-    m_pSpecularTexture = nullptr;
-
-    m_pDiffuseMapVariable->Release();
-    m_pGlossMapVariable->Release();
-    m_pNormalMapVariable->Release();
-    m_pSpecularMapVariable->Release();
-
-    m_pDiffuseMapVariable = nullptr;
-    m_pGlossMapVariable = nullptr;
-    m_pNormalMapVariable = nullptr;
-    m_pSpecularMapVariable = nullptr;
-
-}
 
 void dae::PhongDiffuseEffect::SetupEffect()
 {

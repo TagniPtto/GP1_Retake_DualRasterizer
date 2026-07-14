@@ -83,8 +83,8 @@ namespace dae
 		float* m_pDepthBuffer{};
 
 
-		void VertexTransformationFunction(const std::vector<VS_INPUT>& vertices_in, std::vector<Vertex_Out>& vertices_out) const;
-		ColorRGB PixelShading(const Vertex_Out& v)const;
+		void VertexTransformationFunction(const std::vector<VS_INPUT>& vertices_in, std::vector<VS_OUTPUT>& vertices_out) const;
+		ColorRGB PixelShading(const VS_OUTPUT& v)const;
 
 	public:
 		ColorRGB m_uniformClearColor{ .1f, .1f, .1f };

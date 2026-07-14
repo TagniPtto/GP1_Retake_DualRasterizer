@@ -1,30 +1,10 @@
-#include "DirectXRenderer.h"
+#include "dx_Renderer.h"
+#include "dx_Utils.h"
 
 #include <iostream>
 
-inline void PrintHResult(HRESULT hr)
-{
-    LPSTR message = nullptr;
 
-    FormatMessageA(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
-        nullptr,
-        hr,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPSTR)&message,
-        0,
-        nullptr);
-
-    if (message)
-    {
-        std::cout << message << std::endl;
-        LocalFree(message);
-    }
-}
-
-HRESULT dae::DirectXRenderer::CreateDeviceAndContext()
+HRESULT DXRenderer::CreateDeviceAndContext()
 {
     D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
 
@@ -42,7 +22,7 @@ HRESULT dae::DirectXRenderer::CreateDeviceAndContext()
     return result;
 }
 
-HRESULT dae::DirectXRenderer::CreateSwapChain()
+HRESULT DXRenderer::CreateSwapChain()
 {
     IDXGIFactory1* factory{};
     HRESULT result = CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&factory));
@@ -81,7 +61,7 @@ HRESULT dae::DirectXRenderer::CreateSwapChain()
     return result;
 }
 
-HRESULT dae::DirectXRenderer::CreateDepthStencil()
+HRESULT DXRenderer::CreateDepthStencil()
 {
     D3D11_TEXTURE2D_DESC depthStencilDescriptor{};
     depthStencilDescriptor.Width = m_Width;
@@ -118,7 +98,7 @@ HRESULT dae::DirectXRenderer::CreateDepthStencil()
     return result;
 }
 
-HRESULT dae::DirectXRenderer::CreateRenderTargetView()
+HRESULT DXRenderer::CreateRenderTargetView()
 {
 
     HRESULT result = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&m_pRenderTargetBuffer));
@@ -127,7 +107,6 @@ HRESULT dae::DirectXRenderer::CreateRenderTargetView()
         return result;
     }
 
-    //D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDescriptor{};
     result = m_pDevice->CreateRenderTargetView(m_pRenderTargetBuffer,nullptr,&m_pRenderTargetView);
     if (FAILED(result)) {
         PrintHResult(result);
@@ -135,13 +114,13 @@ HRESULT dae::DirectXRenderer::CreateRenderTargetView()
     return result;
 }
 
-HRESULT dae::DirectXRenderer::BindBuffersToOutputMerger()
+HRESULT DXRenderer::BindBuffersToOutputMerger()
 {
     m_pDeviceContext->OMSetRenderTargets(1,&m_pRenderTargetView,m_pDepthStencilView);
     return S_OK;
 }
 
-HRESULT dae::DirectXRenderer::SetRasterizerViewport()
+HRESULT DXRenderer::SetRasterizerViewport()
 {
     D3D11_VIEWPORT viewport{};
     viewport.Width = m_Width;
@@ -156,19 +135,19 @@ HRESULT dae::DirectXRenderer::SetRasterizerViewport()
     return S_OK;
 }
 
-void dae::DirectXRenderer::Initialize(SDL_Window* handle)
+void DXRenderer::Initialize(SDL_Window* handle)
 {
     m_windowHandle = handle;
-    SDL_GetWindowSize(m_windowHandle , &m_Width, &m_Height);
+    SDL_GetWindowSize(m_windowHandle, &m_Width, &m_Height);
 
     std::cout << "[Renderer] Creating D3D11 Device ...\n";
-    if (FAILED(CreateDeviceAndContext())) 
+    if (FAILED(CreateDeviceAndContext()))
     {
         std::cout << "[Renderer] Failed to Create D3D11 Device ...\n";
         return;
     }
     std::cout << "[Renderer] Creating D3D11 SwapChain ...\n";
-    if (FAILED(CreateSwapChain())) 
+    if (FAILED(CreateSwapChain()))
     {
         std::cout << "[Renderer] Failed to Create D3D11 SwapChain ...\n";
         return;
@@ -193,7 +172,7 @@ void dae::DirectXRenderer::Initialize(SDL_Window* handle)
 
     std::cout << "[Renderer] D3D11 Initialization success...\n";
 }
-dae::DirectXRenderer::~DirectXRenderer()
+DXRenderer::~DXRenderer()
 {
     if (m_pRenderTargetView)
     {
@@ -226,13 +205,41 @@ dae::DirectXRenderer::~DirectXRenderer()
 
 
 }
-void dae::DirectXRenderer::Render() const
+void DXRenderer::Render() const
 {
-    m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, clearColor);
+    m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, m_clearColor);
     m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView,D3D11_CLEAR_STENCIL| D3D11_CLEAR_DEPTH,1.0f,0);
 
     m_pSwapChain->Present(0,0);
 }
 
-void dae::DirectXRenderer::Update(const Timer* pTimer)
+void DXRenderer::DrawMesh(const Mesh& mesh) const
+{
+    const auto& dxMaterial = m_materialResources.at(mesh.GetMaterial());
+    const auto& dxMesh = m_meshResources.at(&mesh);
+    const auto effect = dxMaterial->GetEffectPtr();
+    const auto inputLayout = effect->GetInputLayoutPtr();
+    const auto topology = mesh.m_triangleTopology == PrimitiveTopology::TriangleStrip ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    
+    m_pDeviceContext->IASetPrimitiveTopology(topology);
+    m_pDeviceContext->IASetInputLayout(inputLayout);
+
+
+    D3DX11_TECHNIQUE_DESC techniqueDescription{};
+
+    HRESULT result = effect->GetEffectTechniquePtr(m_techniqueIndex)->GetDesc(&techniqueDescription);
+    if (FAILED(result)) {
+        PrintHResult(result);
+    }
+    for (UINT i{}; i < techniqueDescription.Passes; i++) {
+
+        result = effect->GetEffectTechniquePtr(m_techniqueIndex)->GetPassByIndex(i)->Apply(0, m_pDeviceContext);
+        if (FAILED(result)) {
+            PrintHResult(result);
+        }
+        m_pDeviceContext->DrawIndexed(mesh.m_indices.size(), 0, 0);
+    }
+}
+
+void DXRenderer::Update(const dae::Timer* pTimer)
 {}

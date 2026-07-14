@@ -8,7 +8,7 @@
 
 
 namespace dae {
-	inline bool TriangleTest(const Vertex_Out& v0, const Vertex_Out& v1, const Vertex_Out& v2, const Vector2& p, Vector3& outWeigths) {
+	inline bool TriangleTest(const VS_OUTPUT& v0, const VS_OUTPUT& v1, const VS_OUTPUT& v2, const Vector2& p, Vector3& outWeigths) {
 		const Vector2 p0{ v0.position.x,v0.position.y };
 		const Vector2 p1{ v1.position.x,v1.position.y };
 		const Vector2 p2{ v2.position.x,v2.position.y };
@@ -300,9 +300,9 @@ namespace dae {
 		}
 		for (int i{}; i < m_pMesh->m_indices.size(); i += 3) {
 
-			const Vertex_Out& v0{ m_pMesh->m_vertices_out[m_pMesh->m_indices[i + 0]] };
-			const Vertex_Out& v1{ m_pMesh->m_vertices_out[m_pMesh->m_indices[i + 1]] };
-			const Vertex_Out& v2{ m_pMesh->m_vertices_out[m_pMesh->m_indices[i + 2]] };
+			const VS_OUTPUT& v0{ m_pMesh->m_vertices_out[m_pMesh->m_indices[i + 0]] };
+			const VS_OUTPUT& v1{ m_pMesh->m_vertices_out[m_pMesh->m_indices[i + 1]] };
+			const VS_OUTPUT& v2{ m_pMesh->m_vertices_out[m_pMesh->m_indices[i + 2]] };
 
 			if ((Vector3::Dot(v1.normal, v1.viewDirection) < 0 && Vector3::Dot(v2.normal, v2.viewDirection) < 0 && Vector3::Dot(v0.normal, v0.viewDirection) < 0)) {
 				continue;
@@ -348,7 +348,7 @@ namespace dae {
 						if (m_pDepthBuffer[px + py * m_Width] > depth && (clippingDepth >= 0 && clippingDepth <= 1)) {
 							m_pDepthBuffer[px + py * m_Width] = depth;
 
-							Vertex_Out vOut{
+							VS_OUTPUT vOut{
 								Vector4{(weigths.x * v0.position / (v0.position.w) + weigths.y * v1.position / (v1.position.w) + weigths.z * v2.position / (v2.position.w)) * depth,1.0f},
 								ColorRGB{weigths.x,weigths.y,weigths.z},
 								(weigths.x * v0.uv / (v0.position.w) + weigths.y * v1.uv / (v1.position.w) + weigths.z * v2.uv / (v2.position.w)) * depth,
@@ -423,7 +423,7 @@ namespace dae {
 	}
 }
 
-void dae::Renderer::VertexTransformationFunction(const std::vector<VS_INPUT>& vertices_in, std::vector<Vertex_Out>& vertices_out) const
+void dae::Renderer::VertexTransformationFunction(const std::vector<VS_INPUT>& vertices_in, std::vector<VS_OUTPUT>& vertices_out) const
 {
 	const bool orthographic{ false };
 	vertices_out.clear();
@@ -444,7 +444,7 @@ void dae::Renderer::VertexTransformationFunction(const std::vector<VS_INPUT>& ve
 			np.y /= np.w;
 			np.z /= np.w;
 		}
-		Vertex_Out nv{ np ,
+		VS_OUTPUT nv{ np ,
 			ColorRGB{p.color[0],p.color[1],p.color[2]},
 			Vector2{ p.uv[0],p.uv[1]},
 			newNormal,
@@ -454,7 +454,7 @@ void dae::Renderer::VertexTransformationFunction(const std::vector<VS_INPUT>& ve
 	}
 }
 
-dae::ColorRGB dae::Renderer::PixelShading(const Vertex_Out& v)const
+dae::ColorRGB dae::Renderer::PixelShading(const VS_OUTPUT& v)const
 {
 	const Vector3 ligthDirection{ .577f,-.577f,.577f };
 

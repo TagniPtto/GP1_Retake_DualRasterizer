@@ -1,15 +1,15 @@
-#include "../gpu_Texture.h"
-
+#pragma once
 
 #include "d3d11.h"
 
 
-class DXTexture : public GPUTexture {
+class DXTexture {
 private:
 	ID3D11Texture2D* m_pTexture;
 	ID3D11ShaderResourceView* m_pShaderResouceView;
 public:
-	virtual ~DXTexture() = default;
-
+	explicit DXTexture(ID3D11Device* pDevice);
+	virtual ~DXTexture();
+	ID3D11ShaderResourceView* GetShaderResourceView();
 
 };

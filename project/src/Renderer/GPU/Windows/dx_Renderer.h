@@ -1,31 +1,35 @@
 #pragma once
 
-#include "../../IRenderer.h"
 #include <unordered_map>
+
+#include "../../IRenderer.h"
+#include "dx_Mesh.h"
+#include "dx_Material.h"
+
 
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <dxgi.h>
 #include <d3dx11effect.h>
 
-namespace dae
+
+class Mesh;
+class Material;
+
+class DXRenderer : public IRenderer
 {
-	class DirectXRenderer : public IRenderer {
 	private:
 		
 		SDL_Window* m_windowHandle;
 		int m_Width{};
 		int m_Height{};
 
-		//std::unordered_map<uint64_t, > m_meshResources;
-		//std::unordered_map<uint64_t, > m_textureResources;
-		//std::unordered_map<uint64_t, > m_effectResources;
-
-
+		std::unordered_map<Mesh*,		std::unique_ptr<DXMesh>> m_meshResources;
+		std::unordered_map<Material*,	std::unique_ptr<DXMaterial >> m_materialResources;
 
 	
-		ID3D11Device* m_pDevice;  					// For creating GPU Resources
-		ID3D11DeviceContext* m_pDeviceContext;		// For Telling the GPU What to do (Thing like drawing commands)
+		ID3D11Device* m_pDevice;  					
+		ID3D11DeviceContext* m_pDeviceContext;
 		
 		IDXGISwapChain* m_pSwapChain;
 
@@ -35,22 +39,21 @@ namespace dae
 		ID3D11Texture2D* m_pRenderTargetBuffer;
 		ID3D11RenderTargetView* m_pRenderTargetView;
 
-		float clearColor[4] = { .39f, .59f, .93f , 1.f };
+		float m_clearColor[4] = { .39f, .59f, .93f , 1.f };
+		uint32_t m_techniqueIndex{};
 
 	public:
-		virtual ~DirectXRenderer() override;
+		virtual ~DXRenderer() override;
 		virtual void Render() const override;
-		virtual void Update(const Timer* pTimer) override;
+		virtual void DrawMesh(const Mesh& mesh) const override;
+		virtual void Update(const dae::Timer* pTimer) override;
 		void Initialize(SDL_Window* handle);
 
 	private:
-
 		HRESULT CreateDeviceAndContext();
 		HRESULT CreateSwapChain();
 		HRESULT CreateDepthStencil();
 		HRESULT CreateRenderTargetView();
 		HRESULT BindBuffersToOutputMerger();
 		HRESULT SetRasterizerViewport();
-
-	};
-}
+};
